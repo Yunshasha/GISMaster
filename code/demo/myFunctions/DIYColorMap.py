@@ -2,7 +2,7 @@ from matplotlib import colors
 
 # Inspired from https://stackoverflow.com/questions/9707676/defining-a-discrete-colormap-for-imshow-in-matplotlib
 
-# 1. Define a custom colormap. 
+# 1. Define a custom colormap, specifying the colors will be used. 
 
 # There are only two colors (excluding white for no value or zero by default) in the output plot. So here we simply set two desired colors to present below or above the pollutant d_threshold.
 # GoodColor refers to the color presenting the concentration of pollutant being below the threshold, while BadColor refers to the contrary. 
@@ -27,7 +27,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
             d_threshold = 40
         elif ds_variable == 'ozone':
             # set random to test, should be 100 instead
-            d_threshold = 100
+            d_threshold = 70
         elif ds_variable == 'carbon_monoxide':
             d_threshold = 4
         elif ds_variable == 'particulate_matter_2.5um':
@@ -43,7 +43,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
         elif ds_variable == 'sulphur_dioxide':
             d_threshold = 40
         elif ds_variable == 'ozone':
-            # only exists daily or peak season thresholds
+            # only exists daily or peak season thresholds. Should do another conditional statement exclusively for ozone, in order to fetch the correct AQG. 
             d_threshold = 0
         elif ds_variable == 'carbon_monoxide':
             # only exists daily threshold
@@ -56,7 +56,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
     bounds=[0,d_threshold,1000]
     return bounds
 
-# 3. Define the norm
+# 3. Define the norm. 
 
 def ColorMap_Norm(d_bounds,d_cmap):
     norm = colors.BoundaryNorm(d_bounds,d_cmap.N)
