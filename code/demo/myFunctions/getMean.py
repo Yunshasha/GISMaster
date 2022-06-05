@@ -1,9 +1,9 @@
 import cdsapi
 import numpy as np
 import pandas as pd
-import xarray as xr
+import xarray as xr 
 
-# 获取原始数据 采用不同的方法
+# Below is note. 
 # nitrogen_dioxide --> no2_conc   
 # particulate_matter_10um  -->  pm10_conc 
 # nitrogen_monoxide --> no_conc
@@ -11,7 +11,10 @@ import xarray as xr
 # ozone --> o3_conc
 # carbon_monoxide --> co_conc
 # particulate_matter_2.5um --> pm2p5_conc
+
 def get_mean(ds_name, ds_time, ds_variable):
+
+    # Download raw data. Currently only support daily timescale. 
 
     c = cdsapi.Client()
     c.retrieve(
@@ -36,11 +39,11 @@ def get_mean(ds_name, ds_time, ds_variable):
             ],
         },
         'download.nc')
-    # 打开数据到 rdata
-    rdata = xr.open_dataset("download.nc")
-    # rdata
 
-    # 获取原始数据 采用不同的方法
+    # Open raw data. This raw data will be used as part of return. 
+    rdata = xr.open_dataset("download.nc")
+
+    # Below is note
     # nitrogen_dioxide --> no2_conc   
     # particulate_matter_10um  -->  pm10_conc 
     # nitrogen_monoxide --> no_conc
@@ -48,6 +51,8 @@ def get_mean(ds_name, ds_time, ds_variable):
     # ozone --> o3_conc
     # carbon_monoxide --> co_conc
     # particulate_matter_2.5um --> pm2p5_conc
+
+    # Now we should retrieve the values of concentration of the input pollutant from raw data. 
 
     if ds_variable == 'nitrogen_dioxide':
         rdata_values = rdata.no2_conc.values
@@ -64,6 +69,7 @@ def get_mean(ds_name, ds_time, ds_variable):
     elif ds_variable == 'particulate_matter_2.5um':
         rdata_values = rdata.pm2p5_conc.values
     
+    # Below we calculate the mean values. For ozone, we don't really understand how to do with "8-hour maximum daily", so here we just seperate 24 hours into 3 parts, calculate the mean values of each part and select the maximum values among them and create a new dataarray contains these maximum mean values of ozone. We are not sure about this yet. 
     if ds_variable == 'ozone':        
         h1 = np.mean(rdata_values[0:8,:,:,:], axis=0)
         h2 = np.mean(rdata_values[8:16,:,:,:], axis=0)
@@ -72,14 +78,16 @@ def get_mean(ds_name, ds_time, ds_variable):
         max_mean = np.fmax(h1,h2,h3)
         
         mean_data =  max_mean
+    
+    # For other pollutants, just simply calculate the mean values in one day. 
     else:
-        # 拿到 原始数据 的 values array 信息
-        # rdata_values
+
         mean_data = np.mean(rdata_values[:,:,:,:], axis=0)
-        
+    
+    # Don't forget that we will need these lats and lons for our plot. So they are returned as well. 
     latitude = rdata.latitude.values
     longitude = rdata.longitude.values
 
-
-    return [mean_data, latitude, longitude, rdata]
+    # Return these values
+    return [mean_data[0], latitude, longitude, rdata]
 
