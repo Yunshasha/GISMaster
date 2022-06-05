@@ -64,14 +64,14 @@ def get_mean(ds_name, ds_time, ds_variable):
     elif ds_variable == 'particulate_matter_2.5um':
         rdata_values = rdata.pm2p5_conc.values
     
-    if ds_variable == 'particulate_matter_10um':        
+    if ds_variable == 'ozone':        
         h1 = np.mean(rdata_values[0:8,:,:,:], axis=0)
         h2 = np.mean(rdata_values[8:16,:,:,:], axis=0)
         h3 = np.mean(rdata_values[16:24,:,:,:], axis=0)
         
         max_mean = np.fmax(h1,h2,h3)
         
-        return max_mean
+        mean_data =  max_mean
     else:
         # 拿到 原始数据 的 values array 信息
         # rdata_values
