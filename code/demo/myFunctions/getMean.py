@@ -76,8 +76,9 @@ def get_mean(ds_name, ds_time, ds_variable):
         # 拿到 原始数据 的 values array 信息
         # rdata_values
         mean_data = np.mean(rdata_values[:,:,:,:], axis=0)
-        latitude = rdata.latitude.values
-        longitude = rdata.longitude.values
+        
+    latitude = rdata.latitude.values
+    longitude = rdata.longitude.values
 
 
     return [mean_data, latitude, longitude, rdata]
