@@ -1,3 +1,5 @@
+# this file just used to do some self-testing. not relevant to the program.
+
 import cdsapi
 import numpy as np
 import pandas as pd
