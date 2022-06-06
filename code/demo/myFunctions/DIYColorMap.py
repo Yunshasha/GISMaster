@@ -27,7 +27,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
             d_threshold = 40
         elif ds_variable == 'ozone':
             # set random to test, should be 100 instead
-            d_threshold = 70
+            d_threshold = 100
         elif ds_variable == 'carbon_monoxide':
             d_threshold = 4
         elif ds_variable == 'particulate_matter_2.5um':
