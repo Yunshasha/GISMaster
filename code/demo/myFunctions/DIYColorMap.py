@@ -44,10 +44,12 @@ def ColorMap_Threshold(ds_variable,d_timescale):
             d_threshold = 40
         elif ds_variable == 'ozone':
             # only exists daily or peak season thresholds. Should do another conditional statement exclusively for ozone, in order to fetch the correct AQG. 
-            d_threshold = 0
+            print("Annual timescale is not available for ozone. ")
+            return 
         elif ds_variable == 'carbon_monoxide':
             # only exists daily threshold
-            d_threshold = 0
+            print("Annual timescale is not available for carbon monoxide. ")
+            return 
         elif ds_variable == 'particulate_matter_2.5um':
             d_threshold = 5
     else: 
