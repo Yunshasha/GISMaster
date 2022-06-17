@@ -18,7 +18,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
     if d_timescale == "Daily": 
         if ds_variable == 'nitrogen_dioxide':
             d_threshold = 25
-        elif ds_variable == 'pm10_wildfires':
+        elif ds_variable == 'particulate_matter_10um':
             d_threshold = 45
         elif ds_variable == 'nitrogen_monoxide':
             # not available?
@@ -35,7 +35,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
     elif d_timescale == "Annual":
         if ds_variable == 'nitrogen_dioxide':
             d_threshold = 10
-        elif ds_variable == 'pm10_wildfires':
+        elif ds_variable == 'particulate_matter_10um':
             d_threshold = 15
         elif ds_variable == 'nitrogen_monoxide':
             # not available? 
