@@ -29,7 +29,7 @@ def ColorMap_Threshold(ds_variable,d_timescale):
             # set random to test, should be 100 instead
             d_threshold = 100
         elif ds_variable == 'carbon_monoxide':
-            d_threshold = 4
+            d_threshold = 4000
         elif ds_variable == 'particulate_matter_2.5um':
             d_threshold = 15
     elif d_timescale == "Annual":
