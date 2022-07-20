@@ -14,7 +14,7 @@ GeoAxes._pcolormesh_patched = Axes.pcolormesh
 # There are only two colors (excluding white for no value or zero by default) in the output plot. So here we simply set two desired colors to present below or above the pollutant threshold.
 # GoodColor refers to the color presenting the concentration of pollutant being below the threshold, while BadColor refers to the contrary. 
 # The input are both strings. 
-def plot_cmp(GoodColor, BadColor): 
+def plot_ColorMap(GoodColor, BadColor): 
     cmap = colors.ListedColormap([GoodColor,BadColor])
     return cmap
 
@@ -60,7 +60,7 @@ def plot_Threshold(ds_variable,d_timescale):
         return
     return d_threshold
 
-def plot_final(data_array, longitude, latitude, projection, color_scale, unit, long_name, vmin, vmax, threshold,
+def plot_Final(data_array, longitude, latitude, projection, color_scale, unit, long_name, vmin, vmax, threshold,
                          set_global=True, lonmin=-180, lonmax=180, latmin=-90, latmax=90, GoodColor='Green', BadColor='Red',):
     """ 
     Visualizes a xarray.DataArray with matplotlib's pcolormesh function.
