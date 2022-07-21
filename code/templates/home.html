@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="../static/dist/bootstrap/css/bootstrap-grid.min.css" />
+    <link rel="stylesheet" href="../static/css/leaflet.css" />
+    <link rel="stylesheet" href="../static/dist/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="../static/css/tachyons.min.css">
+
+
+</head>
+
+<body style="height: 100%; margin: 0">
+    <div class="row" style="height: 10%;">
+        <div class="col-3">
+            <table id="requestTable" class="requestTable">
+                <tr>
+                    <th>
+                        start date:
+                    </th>
+                    <td><input id="sdate" name="sdate" type="date" value="2020-10-11" required />
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        end date:
+                    </th>
+                    <td><input id="edate" name="edate" type="date" value="2019-10-11" required />
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        pollutant:
+                    </th>
+                    <td>
+                        <select id="pollutants" class="form-select" aria-label="Default select example">
+
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Nation: </th>
+                    <td><select id="nation" name="nation">
+                            <option value="DE">Germany</option>
+                            <option value="IT">Italy</option>
+                            <option value="DK">Danmark</option>
+                            <option value="FR">France</option>
+                            <option value="PT">Portugal</option>
+                        </select></td>
+                </tr>
+
+                <tr>
+                    <td>
+                    <td>
+                        <button id="submit1" name="submit1" class="btn btn-primary" type="button">Request</button>
+                    </td>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div class="col-9">
+            <div id="map" style="height: 800px;"></div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="../static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/dist/leaflet/leaflet.js"></script>
+    <script src="../static/js/leaflet-heat.js"></script>
+    <script src="../static/js/papaparse.min.js"></script>
+    <script src="../static/NUTS_RG_01M_2021_4326_LEVL_0.js"></script>
+
+    <script>
+        var map;
+        var layerControl;
+        var concentrationCircle;
+        var europeanData;
+        var popLayer;
+
+
+        $(function () {
+
+
+            //加载 basemap
+            $(document).ready(function () {
+
+                //定义地图容器
+                map = L.map('map', {
+                    center: [45.450859, 9.206543],
+                    zoom: 5,
+                    zoomControl: true,
+                    attributionControl: false,
+                });
+
+
+
+                //设置底图
+                var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '@ OpenStreetMap'
+                }).addTo(map);
+
+                var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
+                var mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+                var streets = L.tileLayer(mbUrl, {
+                    id: 'mapbox/streets-v11',
+                    tileSize: 512,
+                    zoomOffset: -1,
+                    attribution: mbAttr
+                });
+                var satellite = L.tileLayer(mbUrl, {
+                    id: 'mapbox/satellite-v9',
+                    tileSize: 512,
+                    zoomOffset: -1,
+                    attribution: mbAttr
+                });
+
+                //添加欧洲矢量地图
+                europeanData = L.geoJson(myData, {
+                    // A Function that will be called once for each
+                    // created Feature, after it has been created and styled
+                    onEachFeature: function (feature, layer) {
+                        layer.on("mouseover", function (e) {
+                            // bindPopup
+                            popLayer = layer.bindPopup(feature.properties.NUTS_NAME);
+                            
+                            // show voivodeship
+                            // addTextToDiv(feature.properties.NUTS_NAME);
+                            // style
+                            this.setStyle({
+                                fillColor: "#eb4034",
+                                weight: 2,
+                                color: "#eb4034",
+                                fillOpacity: 0.7,
+                            });
+                        });
+                        layer.on("mouseout", function () {
+                            popLayer.closePopup();
+                            // style
+                            this.setStyle({
+                                fillColor: "#3388ff",
+                                weight: 2,
+                                color: "#3388ff",
+                                fillOpacity: 0.2,
+                            });
+                        });
+                    },
+                }).addTo(map);
+
+
+                //分组1
+                var baseLayers = {
+                    'OpenStreetMap': osm,
+                    'Streets': streets,
+                    'Satellite': satellite
+                };
+
+                //分组2
+                var overlays = {
+                    'europeanData':europeanData
+                }
+
+
+                //添加control到map
+                layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+                var layerScale = L.control.scale().addTo(map);
+
+
+
+            })
+
+
+
+            //加载网页时 请求所有 pollutants 添加到select
+            $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:5000/getBasicInfo",
+                dataType: 'json',
+                data: {},// 这次请求要携带的数据
+                success: function (res) {
+                    const data = res;
+                    var objString = JSON.stringify(data);
+                    var objJson = JSON.parse(objString);
+
+                    pollutantList = objJson.pollutants;
+
+                    //加载pollutants下拉框
+                    var strPollutantOption = '';
+                    for (var i = 0; i < pollutantList.length; i++) {
+                        var opt = '<option id=\"' + i + '\"' + ' value=\"' + pollutantList[i] + '\">' + pollutantList[i] + '</option>';
+                        strPollutantOption += opt;
+                    }
+                    $('#pollutants').html(strPollutantOption);
+
+                }
+            })
+
+
+            /*查询 某个pollutants 在 某个时间段内的 concentration*/
+            $('#submit1').on('click', function () {
+                if (concentrationCircle) {
+                    map.removeLayer(concentrationCircle);
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: "http://127.0.0.1:5000/queryByNation",
+                    dataType: 'json',
+                    data: {
+                        'sdate': $('#sdate').val(),
+                        'edate': $('#edate').val(),
+                        'pollutants': $('#pollutants').val(),
+                        'nation': $('#nation').val()
+
+                    },// 这次请求要携带的数据
+                    success: function (res) {
+                        //alert('success')
+
+                        const data = res;
+                        var objString = JSON.stringify(data);
+                        var objJson = JSON.parse(objString);
+                        meandata = objJson.meandata;
+                        capitalCoor = objJson.capitalCoor;
+                        myColor = objJson.circle_color;
+
+                        concentrationCircle = L.circle(capitalCoor, {
+                            color: myColor,
+                            fillColor: myColor,
+                            fillOpacity: 0.5,
+                            radius: meandata * 1000
+                        }).bindPopup("concentrate" + meandata + 1 + " μg/m3").addTo(map);
+
+
+                        highlightLayer('IT')
+
+
+                        
+
+
+                    }//success
+
+                })//ajax
+
+            })//click
+
+
+
+        })//function
+
+
+        function highlightLayer(layerID) {
+            map._layers['NUTS_ID'+LayerID].setStyle({
+                'color': '#333333',
+                'weight': 2,
+                'opacity': 1
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
