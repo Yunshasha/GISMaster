@@ -52,11 +52,11 @@ def getBasicInfo():
     # ozone --> o3_conc
     # particulate_matter_2.5um --> pm2p5_conc
     # particulate_matter_10um  -->  pm10_conc
-    # nitrogen_monoxide --> no_conc
+    
 
     data_list = {}
     data_list['pollutants'] = list(['carbon_monoxide', 'sulphur_dioxide', 'nitrogen_dioxide',
-                                   'ozone', 'particulate_matter_2', 'particulate_matter_10um', 'nitrogen_monoxide', 'song'])
+                                   'ozone', 'particulate_matter_2', 'particulate_matter_10um'])
 
     return Response(json.dumps(data_list), mimetype='application/json')
 
@@ -100,11 +100,7 @@ def getColor(pollutants, mean_country):
             myColor = 'red'
         else:
             myColor = 'green'
-    elif ds_variable == 'nitrogen_monoxide':
-        if mean_country > 100:
-            myColor = 'red'
-        else:
-            myColor = 'green'
+
     elif ds_variable == 'sulphur_dioxide':
         if mean_country > 100:
             myColor = 'red'

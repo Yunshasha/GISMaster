@@ -128,6 +128,7 @@
                     // created Feature, after it has been created and styled
                     onEachFeature: function (feature, layer) {
                         layer.on("mouseover", function (e) {
+                           // alert(e.latlng)
                             // bindPopup
                             popLayer = layer.bindPopup(feature.properties.NUTS_NAME);
                             

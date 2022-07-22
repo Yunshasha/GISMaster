@@ -24,13 +24,13 @@ def plot_Threshold(ds_variable,d_timescale):
             d_threshold = 25
         elif ds_variable == 'particulate_matter_10um':
             d_threshold = 45
-        elif ds_variable == 'nitrogen_monoxide':
-            # not available?
-            d_threshold = 0
+       
         elif ds_variable == 'sulphur_dioxide':
-            d_threshold = 40
+            d_threshold = 40    
+           
         elif ds_variable == 'ozone':
-            d_threshold = 80
+            print("daily timescale is not available for ozone. ")
+            return
         elif ds_variable == 'carbon_monoxide':
             d_threshold = 4000
         elif ds_variable == 'particulate_matter_2.5um':
@@ -40,21 +40,20 @@ def plot_Threshold(ds_variable,d_timescale):
             d_threshold = 10
         elif ds_variable == 'particulate_matter_10um':
             d_threshold = 15
-        elif ds_variable == 'nitrogen_monoxide':
-            # not available? 
-            d_threshold = 0
+        elif ds_variable == 'particulate_matter_2.5um':
+            d_threshold = 5
+        
         elif ds_variable == 'sulphur_dioxide':
-            d_threshold = 40
+            print("Annual timescale is not available for sulphur dioxide. ")
+            return
         elif ds_variable == 'ozone':
-            d_threshold = 40 
             print("Annual timescale is not available for ozone. ")
             return 
         elif ds_variable == 'carbon_monoxide':
             # only exists daily threshold
             print("Annual timescale is not available for carbon monoxide. ")
             return 
-        elif ds_variable == 'particulate_matter_2.5um':
-            d_threshold = 5
+        
     else: 
         print("Neither 'Daily' nor 'Annual'!")
         return

@@ -9,7 +9,6 @@ import uuid
 # Below is note.
 # nitrogen_dioxide --> no2_conc
 # particulate_matter_10um  -->  pm10_conc
-# nitrogen_monoxide --> no_conc
 # sulphur_dioxide --> so2_conc
 # ozone --> o3_conc
 # carbon_monoxide --> co_conc
@@ -73,8 +72,8 @@ def get_mean(ds_name, ds_time, ds_variable, ds_area,ds_bounds):
             rdata_values = rdata.no2_conc.values
         elif ds_variable == 'particulate_matter_10um':
             rdata_values = rdata.pm10_conc.values
-        elif ds_variable == 'nitrogen_monoxide':
-            rdata_values = rdata.no_conc.values
+        #elif ds_variable == 'nitrogen_monoxide':
+        #    rdata_values = rdata.no_conc.values
         elif ds_variable == 'sulphur_dioxide':
             rdata_values = rdata.so2_conc.values
         elif ds_variable == 'ozone':
