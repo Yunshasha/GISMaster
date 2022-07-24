@@ -21,7 +21,7 @@ def get_mean(ds_name, ds_time, ds_variable, ds_area,ds_bounds):
     unique_filename = str(uuid.uuid4().hex)    
     fName = unique_filename    
 
-    c = cdsapi.Client()
+    c = cdsapi.Client()    
     c.retrieve(
         ds_name,
         {
@@ -60,7 +60,6 @@ def get_mean(ds_name, ds_time, ds_variable, ds_area,ds_bounds):
         # Below is note
         # nitrogen_dioxide --> no2_conc
         # particulate_matter_10um  -->  pm10_conc
-        # nitrogen_monoxide --> no_conc
         # sulphur_dioxide --> so2_conc
         # ozone --> o3_conc
         # carbon_monoxide --> co_conc
@@ -72,8 +71,6 @@ def get_mean(ds_name, ds_time, ds_variable, ds_area,ds_bounds):
             rdata_values = rdata.no2_conc.values
         elif ds_variable == 'particulate_matter_10um':
             rdata_values = rdata.pm10_conc.values
-        #elif ds_variable == 'nitrogen_monoxide':
-        #    rdata_values = rdata.no_conc.values
         elif ds_variable == 'sulphur_dioxide':
             rdata_values = rdata.so2_conc.values
         elif ds_variable == 'ozone':
@@ -106,3 +103,169 @@ def get_mean(ds_name, ds_time, ds_variable, ds_area,ds_bounds):
         # Return these values
         # return [mean_data[0], latitude, longitude, rdata]
         return [mean_data[0],fName]
+
+
+
+def get_mean_europe(ds_name, ds_time, ds_variable,ds_bounds_list):
+    # Download raw data. Currently only support daily timescale.
+    unique_filename = str(uuid.uuid4().hex)    
+    fName = unique_filename    
+
+
+    c = cdsapi.Client()    
+    c.retrieve(
+        ds_name,
+        {
+            'model': 'ensemble',
+            'date': ds_time,
+            'format': 'netcdf',
+            'variable': ds_variable,
+            'level': '0',
+            'type': 'analysis',
+            'leadtime_hour': '0',
+            'time': [
+                '00:00', '01:00', '02:00',
+                '03:00', '04:00', '05:00',
+                '06:00', '07:00', '08:00',
+                '09:00', '10:00', '11:00',
+                '12:00', '13:00', '14:00',
+                '15:00', '16:00', '17:00',
+                '18:00', '19:00', '20:00',
+                '21:00', '22:00', '23:00',
+            ],
+        },
+        fName)
+
+    # Open raw data. This raw data will be used as part of return.
+    # rdata = xr.open_dataset(fName)
+    # rdata.close()
+
+    with xr.open_dataset(fName) as rdataAll:
+
+        rdataAll.rio.write_crs("epsg:4326", inplace=True)
+        # data["pm2p5_conc"][0].rio.to_raster('test.tif')
+        rdataAll = rdataAll.assign_coords(longitude=(((rdataAll.longitude + 180) % 360) - 180)).sortby('longitude') 
+
+        mean_data_list = []
+
+        for i in range(0,len(ds_bounds_list)):
+            
+            rdata = rdataAll.rio.clip(ds_bounds_list[i],'epsg:4326',all_touched=False)
+
+            # Below is note
+            # nitrogen_dioxide --> no2_conc
+            # particulate_matter_10um  -->  pm10_conc
+            # sulphur_dioxide --> so2_conc
+            # ozone --> o3_conc
+            # carbon_monoxide --> co_conc
+            # particulate_matter_2.5um --> pm2p5_conc
+
+            # Now we should retrieve the values of concentration of the input pollutant from raw data.
+
+            if ds_variable == 'nitrogen_dioxide':
+                rdata_values = rdata.no2_conc.values
+            elif ds_variable == 'particulate_matter_10um':
+                rdata_values = rdata.pm10_conc.values
+            elif ds_variable == 'sulphur_dioxide':
+                rdata_values = rdata.so2_conc.values
+            elif ds_variable == 'ozone':
+                rdata_values = rdata.o3_conc.values
+            elif ds_variable == 'carbon_monoxide':
+                rdata_values = rdata.co_conc.values
+            elif ds_variable == 'particulate_matter_2.5um':
+                rdata_values = rdata.pm2p5_conc.values
+
+            # Below we calculate the mean values. For ozone, we don't really understand how to do with "8-hour maximum daily", so here we just seperate 24 hours into 3 parts, calculate the mean values of each part and select the maximum values among them and create a new dataarray contains these maximum mean values of ozone. We are not sure about this yet.
+            if ds_variable == 'ozone':
+                h1 = np.mean(rdata_values[0:8, :, :, :], axis=0)
+                h2 = np.mean(rdata_values[8:16, :, :, :], axis=0)
+                h3 = np.mean(rdata_values[16:24, :, :, :], axis=0)
+
+                max_mean = np.fmax(h1, h2, h3)
+
+                mean_data = max_mean
+
+            # For other pollutants, just simply calculate the mean values in one day.
+            else:
+
+                mean_data = np.mean(rdata_values[:, :, :, :], axis=0)
+            
+            mean_data_list.append(np.nanmean(mean_data[0]))
+
+
+            
+        # Return these values
+        # return [mean_data[0], latitude, longitude, rdata]
+        return [mean_data_list,fName]
+
+
+def get_mean_europe_test(ds_name, ds_time, ds_variable,ds_bounds_list):
+    # Download raw data. Currently only support daily timescale.
+     
+
+    fName = 'b431e00e6f154011ae87b5c20bb2480d'
+
+
+    # Open raw data. This raw data will be used as part of return.
+    # rdata = xr.open_dataset(fName)
+    # rdata.close()
+
+    with xr.open_dataset(fName) as rdataAll:
+
+        rdataAll.rio.write_crs("epsg:4326", inplace=True)
+        # data["pm2p5_conc"][0].rio.to_raster('test.tif')
+        rdataAll = rdataAll.assign_coords(longitude=(((rdataAll.longitude + 180) % 360) - 180)).sortby('longitude') 
+
+        mean_data_list = []
+
+        for i in range(0,len(ds_bounds_list)):
+            
+            rdata = rdataAll.rio.clip(ds_bounds_list[i],'epsg:4326',all_touched=False)
+
+            # Below is note
+            # nitrogen_dioxide --> no2_conc
+            # particulate_matter_10um  -->  pm10_conc
+            # sulphur_dioxide --> so2_conc
+            # ozone --> o3_conc
+            # carbon_monoxide --> co_conc
+            # particulate_matter_2.5um --> pm2p5_conc
+
+            # Now we should retrieve the values of concentration of the input pollutant from raw data.
+
+            if ds_variable == 'nitrogen_dioxide':
+                rdata_values = rdata.no2_conc.values
+            elif ds_variable == 'particulate_matter_10um':
+                rdata_values = rdata.pm10_conc.values
+            elif ds_variable == 'sulphur_dioxide':
+                rdata_values = rdata.so2_conc.values
+            elif ds_variable == 'ozone':
+                rdata_values = rdata.o3_conc.values
+            elif ds_variable == 'carbon_monoxide':
+                rdata_values = rdata.co_conc.values
+            elif ds_variable == 'particulate_matter_2.5um':
+                rdata_values = rdata.pm2p5_conc.values
+
+            # Below we calculate the mean values. For ozone, we don't really understand how to do with "8-hour maximum daily", so here we just seperate 24 hours into 3 parts, calculate the mean values of each part and select the maximum values among them and create a new dataarray contains these maximum mean values of ozone. We are not sure about this yet.
+            if ds_variable == 'ozone':
+                h1 = np.mean(rdata_values[0:8, :, :, :], axis=0)
+                h2 = np.mean(rdata_values[8:16, :, :, :], axis=0)
+                h3 = np.mean(rdata_values[16:24, :, :, :], axis=0)
+
+                max_mean = np.fmax(h1, h2, h3)
+
+                mean_data = max_mean
+
+            # For other pollutants, just simply calculate the mean values in one day.
+            else:
+
+                mean_data = np.mean(rdata_values[:, :, :, :], axis=0)
+            
+            mean_data_list.append(np.nanmean(mean_data[0]))
+
+
+            
+        # Return these values
+        # return [mean_data[0], latitude, longitude, rdata]
+        return [mean_data_list,fName]
+
+     

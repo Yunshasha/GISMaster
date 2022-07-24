@@ -52,11 +52,10 @@ def getBasicInfo():
     # ozone --> o3_conc
     # particulate_matter_2.5um --> pm2p5_conc
     # particulate_matter_10um  -->  pm10_conc
-    
 
     data_list = {}
     data_list['pollutants'] = list(['carbon_monoxide', 'sulphur_dioxide', 'nitrogen_dioxide',
-                                   'ozone', 'particulate_matter_2', 'particulate_matter_10um'])
+                                   'ozone', 'particulate_matter_2.5um', 'particulate_matter_10um'])
 
     return Response(json.dumps(data_list), mimetype='application/json')
 
@@ -82,7 +81,6 @@ def queryByNation():
     data_list = {}
     data_list['meandata'] = mean_country.tolist()
     data_list['capitalCoor'] = capitalCoor
-    data_list['circle_color'] = myColor
 
     return Response(json.dumps(data_list), mimetype='application/json')
 
@@ -99,8 +97,7 @@ def getColor(pollutants, mean_country):
         if mean_country > 100:
             myColor = 'red'
         else:
-            myColor = 'green'
-
+            myColor = 'green'    
     elif ds_variable == 'sulphur_dioxide':
         if mean_country > 100:
             myColor = 'red'
@@ -123,6 +120,7 @@ def getColor(pollutants, mean_country):
             myColor = 'green'
 
     return myColor
+
 
 def getNationBounds(nation):
     code = nation
@@ -164,6 +162,108 @@ def getRawData(NWSE_area, bounds,pollutants):
         os.remove(fName)
 
     return mean_data
+
+@app.route('/getRawData2')
+def getRawData2():
+    sdate = request.args.get('sdate')
+    pollutants = request.args.get('pollutants')
+
+    path_rg = "data/NUTS_RG_01M_2021_4326_LEVL_0.shp"
+    gdf_rg = gpd.read_file(path_rg)
+    gdf_rg.crs = "EPSG:4326"
+    cntr_code_list = gdf_rg.CNTR_CODE.values
+    bounds_list = []
+    for i in range(0,len(cntr_code_list)):
+        gdf_nation= gdf_rg[gdf_rg.CNTR_CODE == cntr_code_list[i]]
+        bounds = gdf_nation.geometry.apply(mapping).values
+        bounds_list.append(bounds)
+
+    ds_name = 'cams-europe-air-quality-forecasts'
+    ds_time = sdate + '/' + sdate
+    ds_variable = pollutants    #'carbon_monoxide'    
+    ds_bounds_list = bounds_list
+    [mean_data_list,fName] = getMean.get_mean_europe(ds_name=ds_name, ds_time=ds_time, ds_variable=ds_variable,ds_bounds_list=ds_bounds_list)
+    if pollutants=='carbon_monoxide':
+        mean_data_list=np.array(mean_data_list)/1000
+
+    if os.path.exists(fName):
+        os.remove(fName)
+
+    data2 = {}
+    for i in range(len(cntr_code_list)):
+        data2[cntr_code_list[i]] = str(mean_data_list[i])
+
+    unitStr,threshold = getUnitStr(pollutants);
+
+    data_list = {}
+    data_list['allConcentration'] = data2
+    data_list['unitStr'] = unitStr
+    data_list['threshold'] = threshold
+
+    return Response(json.dumps(data_list), mimetype='application/json')
+
+
+def getUnitStr(pollutants):
+    if pollutants=='carbon_monoxide':
+        unitStr = 'Concentration: unit mg/m3'
+        threshold = 4
+    else:
+        unitStr = 'Concentration: unit ug/m3'
+        if pollutants=='sulphur_dioxide':
+            threshold = 40
+        elif pollutants=='nitrogen_dioxide':
+            threshold = 25
+        elif pollutants=='particulate_matter_2.5um':
+            threshold = 15
+        elif pollutants=='particulate_matter_10um':
+            threshold = 45
+        elif pollutants=='ozone':
+            # if is day dont have threshold
+            threshold = 0
+    
+    return unitStr,threshold
+
+
+
+# test
+@app.route('/getRawData3')
+def getRawData3():
+    sdate = request.args.get('sdate')
+    pollutants = request.args.get('pollutants')
+
+    path_rg = "data/NUTS_RG_01M_2021_4326_LEVL_0.shp"
+    gdf_rg = gpd.read_file(path_rg)
+    gdf_rg.crs = "EPSG:4326"
+    cntr_code_list = gdf_rg.CNTR_CODE.values
+    bounds_list = []
+    for i in range(0,len(cntr_code_list)):
+        gdf_nation= gdf_rg[gdf_rg.CNTR_CODE == cntr_code_list[i]]
+        bounds = gdf_nation.geometry.apply(mapping).values
+        bounds_list.append(bounds)
+
+    ds_name = 'cams-europe-air-quality-forecasts'
+    ds_time = sdate + '/' + sdate
+    ds_variable = pollutants    #'carbon_monoxide'    
+    ds_bounds_list = bounds_list
+    [mean_data_list,fName] = getMean.get_mean_europe_test(ds_name=ds_name, ds_time=ds_time, ds_variable=ds_variable,ds_bounds_list=ds_bounds_list)
+    if pollutants=='ozone':
+        mean_data_list=mean_data_list/1000
+
+    # if os.path.exists(fName):
+    #     os.remove(fName)
+
+    data2 = {}
+    for i in range(len(cntr_code_list)):
+        data2[cntr_code_list[i]] = str(mean_data_list[i])
+
+    unitStr,threshold = getUnitStr(pollutants);
+
+    data_list = {}
+    data_list['allConcentration'] = data2
+    data_list['unitStr'] = unitStr
+    data_list['threshold'] = threshold
+
+    return Response(json.dumps(data_list), mimetype='application/json')
 
 
 

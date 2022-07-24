@@ -8,31 +8,43 @@
     <link rel="stylesheet" href="../static/css/leaflet.css" />
     <link rel="stylesheet" href="../static/dist/leaflet/leaflet.css" />
     <link rel="stylesheet" href="../static/css/tachyons.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/leaflet.legend.css" />
 
 
 </head>
 
-<body style="height: 100%; margin: 0">
-    <div class="row" style="height: 10%;">
-        <div class="col-3">
-            <table id="requestTable" class="requestTable">
-                <tr>
-                    <th>
-                        start date:
-                    </th>
-                    <td><input id="sdate" name="sdate" type="date" value="2020-10-11" required />
-                    </td>
-                </tr>
+<body>
+    <div id="lmask" class="lmask">
+        <img src="../static/images/loading1.gif">
+    </div>
 
-                <tr>
-                    <th>
-                        end date:
-                    </th>
-                    <td><input id="edate" name="edate" type="date" value="2019-10-11" required />
-                    </td>
-                </tr>
+    
+    <div class="d-flex align-items-center p-0 my-2 text-white bg-blue rounded shadow-sm">
+        <!-- style="background-color:#33A6E7;" -->
+        <img class="me-3" src="../static/images/map.png" alt="" width="48" height="38">
+        <div class="lh-1">
+            <h1 class="h6 mb-0 text-white lh-1" style="color:white;">Our Web</h1>
+            <small style="color:white;">Yun Shasha & Gao Jiawei</small>
+        </div>
+    </div>
 
-                <tr>
+
+    <div class="row p-4 pb-0 pe-lg-0 pt-lg-1 align-items-center rounded-3 border shadow-lg">
+        <div class="row">
+            <div class="col-3" style="background-color:#F5F5F5;">
+                <table id="requestTable" class="requestTable">
+                    <tr>
+                        <td id="titleTD">
+                            Date:
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input id="sdate" name="sdate" class="form-control" type="date" value="2022-01-01" required/>
+                        </td>
+                    </tr> 
+                    <!-- <tr>
                     <th>
                         pollutant:
                     </th>
@@ -41,41 +53,86 @@
 
                         </select>
                     </td>
-                </tr>
+                </tr> -->
 
-                <tr>
-                    <th>Nation: </th>
-                    <td><select id="nation" name="nation">
-                            <option value="DE">Germany</option>
-                            <option value="IT">Italy</option>
-                            <option value="DK">Danmark</option>
-                            <option value="FR">France</option>
-                            <option value="PT">Portugal</option>
-                        </select></td>
-                </tr>
+                    <tr>
+                        <td id="titleTD">
+                            Pollutant:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- <div>
+                        <div class="form-check">
+                            <input id="carbon_monoxide" name="carbon_monoxide" type="radio" class="form-check-input" required="">
+                            <label class="form-check-label" for="carbon_monoxide">carbon_monoxide</label>
+                        </div>                        
+                        </div> -->
 
-                <tr>
-                    <td>
-                    <td>
-                        <button id="submit1" name="submit1" class="btn btn-primary" type="button">Request</button>
-                    </td>
-                    </td>
-                </tr>
+                            <fieldset id="pollutants">
+                                <!-- <legend>Select one pollutant:</legend> -->
+                                <div>
+                                    <input type="radio" id="carbon_monoxide" name="pollutant" value="carbon_monoxide"
+                                        checked>
+                                    <label for="carbon_monoxide">CO</label>
+                                </div>
 
-            </table>
+                                <div>
+                                    <input type="radio" id="ozone" name="pollutant" value="ozone">
+                                    <label for="ozone">O<sub>3</sub></label>
+                                </div>
+
+                                <div>
+                                    <input type="radio" id="sulphur_dioxide" name="pollutant" value="sulphur_dioxide">
+                                    <label for="sulphur_dioxide">SO<sub>2</sub></label>
+                                </div>
+
+                              
+
+                                <div>
+                                    <input type="radio" id="nitrogen_dioxide" name="pollutant" value="nitrogen_dioxide">
+                                    <label for="nitrogen_dioxide">NO<sub>2</sub></label>
+                                </div>
+
+                                <div>
+                                    <input type="radio" id="particulate_matter_10um" name="pollutant"
+                                        value="particulate_matter_10um">
+                                    <label for="particulate_matter_10um">PM<sub>10</sub></label>
+                                </div>
+
+                                <div>
+                                    <input type="radio" id="particulate_matter_2.5um" name="pollutant"
+                                        value="particulate_matter_2.5um">
+                                    <label for="particulate_matter_2.5um">PM<sub>2.5</sub></label>
+                                </div>
+
+                            </fieldset>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <button id="submit1" name="submit1" class="btn btn-primary" type="button">Request</button>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+
+            <div class="col-9">
+                <div id="map" style="height: 800px;"></div>
+            </div>
+
         </div>
-
-        <div class="col-9">
-            <div id="map" style="height: 800px;"></div>
-        </div>
-
     </div>
 
     <script type="text/javascript" src="../static/js/jquery.min.js"></script>
     <script type="text/javascript" src="../static/dist/leaflet/leaflet.js"></script>
-    <script src="../static/js/leaflet-heat.js"></script>
+    <script type="text/javascript" src="../static/js/leaflet-heat.js"></script>    
+    <script type="text/javascript" src="../static/js/leaflet.legend.js"></script>
     <script src="../static/js/papaparse.min.js"></script>
     <script src="../static/NUTS_RG_01M_2021_4326_LEVL_0.js"></script>
+
 
     <script>
         var map;
@@ -83,13 +140,60 @@
         var concentrationCircle;
         var europeanData;
         var popLayer;
+        var cntr_code_list;
+        var mean_data_list;
+        var pollutantChecked;
+        var allConcentration ;
+        var unitStr;
+        var legend;
+        var threshold;
 
 
         $(function () {
 
+            //打开网页时 先加载所有 pollutants 到 radio
+            // $.ajax({
+            //     type: 'GET',
+            //     url: "http://127.0.0.1:5000/getBasicInfo",
+            //     dataType: 'json',
+            //     data: {},// 这次请求要携带的数据
+            //     success: function (res) {
+            //         const data = res;
+            //         var objString = JSON.stringify(data);
+            //         var objJson = JSON.parse(objString);
+
+            //         pollutantList = objJson.pollutants;
+
+            //         //加载pollutants下拉框
+            //         // var strPollutantOption = '';
+            //         // for (var i = 0; i < pollutantList.length; i++) {
+            //         //     var opt = '<option id=\"' + i + '\"' + ' value=\"' + pollutantList[i] + '\">' + pollutantList[i] + '</option>';
+            //         //     strPollutantOption += opt;
+            //         // }
+            //         // $('#pollutants').html(strPollutantOption);
+
+
+            //         var strPollutantRadio = '';
+            //         for (var i = 0; i < pollutantList.length; i++) {
+            //             if (i == 0) {
+            //                 var opt = '<div><input type=\"radio\" name=\"pollutant\"' + ' id=\"' + i + '\" value=\"' + pollutantList[i] + '\" checked><label for=\"' + i + '\">' + pollutantList[i] + '</label></div>';
+            //                 strPollutantRadio += opt;
+            //             } else {
+            //                 var opt = '<div><input type=\"radio\" name=\"pollutant\"' + ' id=\"' + i + '\" value=\"' + pollutantList[i] + '\"><label for=\"' + i + '\">' + pollutantList[i] + '</label></div>';
+            //                 strPollutantRadio += opt;
+            //             }
+
+            //         }
+            //         $('#pollutants').html(strPollutantRadio);
+            //     }
+            // })
+
+            // when load home page, request the current data
+            requestConcentrationData();
 
             //加载 basemap
             $(document).ready(function () {
+                
 
                 //定义地图容器
                 map = L.map('map', {
@@ -98,8 +202,6 @@
                     zoomControl: true,
                     attributionControl: false,
                 });
-
-
 
                 //设置底图
                 var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -128,29 +230,32 @@
                     // created Feature, after it has been created and styled
                     onEachFeature: function (feature, layer) {
                         layer.on("mouseover", function (e) {
-                           // alert(e.latlng)
                             // bindPopup
-                            popLayer = layer.bindPopup(feature.properties.NUTS_NAME);
-                            
+                            var cntr_code = feature.properties.CNTR_CODE
+                            popLayer = layer.bindPopup("Country: " + feature.properties.NUTS_NAME + "<br>" + "Pollutant: "+pollutantChecked + "<br>" + unitStr + "<br>"+ "Value: " +allConcentration[cntr_code]);
+                            popLayer.openPopup(e.latlng);
+
                             // show voivodeship
                             // addTextToDiv(feature.properties.NUTS_NAME);
                             // style
-                            this.setStyle({
-                                fillColor: "#eb4034",
-                                weight: 2,
-                                color: "#eb4034",
-                                fillOpacity: 0.7,
-                            });
+                            // this.setStyle({
+                            //     // fillColor: "none",
+                            //     weight: 2,
+                            //     opacity: 1,
+                            //     color: "#faea0a",
+                            //     // fillOpacity: 0.7,
+                            // });
                         });
                         layer.on("mouseout", function () {
                             popLayer.closePopup();
                             // style
-                            this.setStyle({
-                                fillColor: "#3388ff",
-                                weight: 2,
-                                color: "#3388ff",
-                                fillOpacity: 0.2,
-                            });
+                            // this.setStyle({
+                            //     // fillColor: "none",
+                            //     weight: 2,
+                            //     opacity: 1,
+                            //     color: "#3388ff",
+                            //     // fillOpacity: 0.2,
+                            // });
                         });
                     },
                 }).addTo(map);
@@ -165,7 +270,7 @@
 
                 //分组2
                 var overlays = {
-                    'europeanData':europeanData
+                    'europeanData': europeanData
                 }
 
 
@@ -174,94 +279,126 @@
                 var layerScale = L.control.scale().addTo(map);
 
 
+                
+
 
             })
-
-
-
-            //加载网页时 请求所有 pollutants 添加到select
-            $.ajax({
-                type: 'GET',
-                url: "http://127.0.0.1:5000/getBasicInfo",
-                dataType: 'json',
-                data: {},// 这次请求要携带的数据
-                success: function (res) {
-                    const data = res;
-                    var objString = JSON.stringify(data);
-                    var objJson = JSON.parse(objString);
-
-                    pollutantList = objJson.pollutants;
-
-                    //加载pollutants下拉框
-                    var strPollutantOption = '';
-                    for (var i = 0; i < pollutantList.length; i++) {
-                        var opt = '<option id=\"' + i + '\"' + ' value=\"' + pollutantList[i] + '\">' + pollutantList[i] + '</option>';
-                        strPollutantOption += opt;
-                    }
-                    $('#pollutants').html(strPollutantOption);
-
-                }
-            })
-
-
+            
             /*查询 某个pollutants 在 某个时间段内的 concentration*/
             $('#submit1').on('click', function () {
-                if (concentrationCircle) {
-                    map.removeLayer(concentrationCircle);
-                }
-
-                $.ajax({
-                    type: 'GET',
-                    url: "http://127.0.0.1:5000/queryByNation",
-                    dataType: 'json',
-                    data: {
-                        'sdate': $('#sdate').val(),
-                        'edate': $('#edate').val(),
-                        'pollutants': $('#pollutants').val(),
-                        'nation': $('#nation').val()
-
-                    },// 这次请求要携带的数据
-                    success: function (res) {
-                        //alert('success')
-
-                        const data = res;
-                        var objString = JSON.stringify(data);
-                        var objJson = JSON.parse(objString);
-                        meandata = objJson.meandata;
-                        capitalCoor = objJson.capitalCoor;
-                        myColor = objJson.circle_color;
-
-                        concentrationCircle = L.circle(capitalCoor, {
-                            color: myColor,
-                            fillColor: myColor,
-                            fillOpacity: 0.5,
-                            radius: meandata * 1000
-                        }).bindPopup("concentrate" + meandata + 1 + " μg/m3").addTo(map);
-
-
-                        highlightLayer('IT')
-
-
-                        
-
-
-                    }//success
-
-                })//ajax
-
+                requestConcentrationData();
+                
             })//click
 
 
-
+            
         })//function
 
+        function requestConcentrationData(){
+            // document.getElementById("lmask").style.display = "block";
+            $('#lmask').show();
 
-        function highlightLayer(layerID) {
-            map._layers['NUTS_ID'+LayerID].setStyle({
-                'color': '#333333',
-                'weight': 2,
-                'opacity': 1
-            });
+            var obj = document.getElementsByName("pollutant");
+            for (var i = 0; i < obj.length; i++) { //遍历Radio 
+                if (obj[i].checked) {
+                    pollutantChecked = obj[i].value;
+                }
+            }
+            // alert(pollutantChecked);
+
+            if (legend) {
+                map.removeControl(legend);
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:5000/getRawData2",
+                dataType: 'json',
+                data: {
+                    'sdate': $('#sdate').val(),//'2020-01-01'
+                    'pollutants': pollutantChecked,
+
+                },// 这次请求要携带的数据
+                success: function (res) {
+                    //alert('success')
+
+                    const data = res;
+                    var objString = JSON.stringify(data);
+                    var objJson = JSON.parse(objString);
+                    allConcentration = objJson.allConcentration;
+                    unitStr = objJson.unitStr;
+                    threshold = objJson.threshold;
+
+                    addLegend(unitStr,threshold);
+
+                    setFeatureStyle();
+
+                    // alert('加载完成');
+                    $('#lmask').hide();
+
+
+                    // alert(allConcentration.CZ)
+
+
+
+                }//success
+
+            })//ajax
+
+        }
+
+        function addLegend(unitStr,threshold){
+
+            legend = L.control.Legend({
+            position: "bottomleft",
+            collapsed: false,
+            symbolWidth: 24,
+            opacity: 1,
+            column: 2,
+            title: unitStr,
+            legends: [{
+                    label: ">" + threshold ,
+                    type: "polygon",
+                    sides: 4,
+                    color: "#FF0000",
+                    fillColor: "#FF0000",
+                    weight: 2
+                },{
+                    label: "<=" + threshold,
+                    type: "polygon",
+                    sides: 4,
+                    color: "#3EE871",
+                    fillColor: "#3EE871",
+                    weight: 2
+                }]
+            })
+        .addTo(map);
+        }
+
+        function setFeatureStyle(){
+            for (var f in europeanData._layers) {
+                var features = europeanData._layers[f];
+                // console.log(features.feature.id);
+                if(allConcentration[features.feature.id]>threshold){
+                    features.setStyle({
+                        fillColor: "#ff0000",
+                        weight: 2,
+                        opacity: 1,
+                        color: "#3388ff",
+                        fillOpacity: 0.2,
+                    });
+                }
+                else if(allConcentration[features.feature.id]<=threshold){
+                    features.setStyle({
+                        fillColor: "#00ff0d",
+                        weight: 2,
+                        opacity: 1,
+                        color: "#3388ff",
+                        fillOpacity: 0.2,
+                   })
+                }       
+                    
+            }
         }
 
     </script>
